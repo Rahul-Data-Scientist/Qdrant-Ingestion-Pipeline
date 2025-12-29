@@ -82,14 +82,3 @@ load_chunk_ingest_scanned_pdf(
 ```
 
 ---
-
-## 📂 Directory Structure
-
-```
-project-root/
-├── extracted_documents/      # OCR page content JSON files
-├── extracted_chunks/         # Chunked documents JSON files
-├── logs/                     # PDF-specific & global logs
-├── pdf_ingestion_pipeline.py # Pipeline code
-├── requirements.txt
-└── README.md
