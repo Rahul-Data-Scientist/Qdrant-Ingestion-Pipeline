@@ -93,28 +93,3 @@ project-root/
 ├── pdf_ingestion_pipeline.py # Pipeline code
 ├── requirements.txt
 └── README.md
-```
-
----
-
-## ✅ Features
-
-* Works for **scanned & digital PDFs**
-* Saves **JSON cache files** to avoid repeated OCR
-* Provides **detailed logging** per PDF & global
-* Supports **large PDFs & batch ingestion**
-* Easy to integrate with **LangChain & Qdrant**
-
----
-
-This README is **GitHub-ready**:
-
-* Mermaid diagram renders cleanly
-* Compact yet informative
-* Users can run the pipeline quickly
-
----
-
-If you want, I can also **make a “visual GitHub README” with colored boxes and emojis** to make it even more **eye-catching and presentation-ready**.
-
-Do you want me to do that next?
