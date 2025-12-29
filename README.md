@@ -1,41 +1,120 @@
-# Detailed Pipeline Diagram
+A **robust PDF ingestion pipeline** that converts **any PDF** (scanned or digital) into **vector embeddings** in **Qdrant**.
 
-    A[PDF Path Input] --> B{Valid PDF?}
-    B -- No --> X[Abort + Log Warning]
-    B -- Yes --> C[Convert PDF to Images<br/>pdf2image]
+It handles:
 
-    C --> D[Iterate Pages]
-    D --> E[Vision OCR per Page<br/>LLM.invoke()]
-    E --> F[Markdown Output]
-    F --> G[OCR Cache JSON]
+* PDF loading & conversion to images
+* OCR extraction using a **Vision LLM** (GPT-4.1-mini)
+* Markdown conversion of text, tables, equations
+* Chunking & metadata enrichment
+* Vector database ingestion with logging & caching
 
-    G --> H[LangChain Document Conversion]
-    H --> I[RecursiveCharacterTextSplitter]
-    I --> J[Chunks]
+---
 
-    J --> K[Metadata Enrichment]
-    K --> K1[Page Number]
-    K --> K2[Chunk ID]
-    K --> K3[Document ID]
-    K --> K4[Semester / Subject / Unit]
-    K --> K5[Embedding Model]
-    K --> K6[Ingestion Version]
+## 🛠️ Main Function
 
-    K --> L[Chunk Cache JSON]
+`load_chunk_ingest_scanned_pdf(pdf_path, subject, semester, unit, version, vision_model, client, collection_name, embedding_model_name, embedding_size)`
 
-    L --> M{Qdrant Collection Exists?}
-    M -- No --> N[Create Collection]
-    M -- Yes --> O[Validate Embedding Model]
+**Inputs:**
 
-    O -->|Mismatch| P[Abort with Error]
-    O -->|Match| Q[Generate Embeddings]
+| Parameter                     | Description                                            |
+| ----------------------------- | ------------------------------------------------------ |
+| `pdf_path`                    | Path to the PDF file                                   |
+| `subject`, `semester`, `unit` | Document metadata                                      |
+| `version`                     | Ingestion version (e.g., "v1")                         |
+| `vision_model`                | LLM for OCR extraction (e.g., GPT-4.1-mini)            |
+| `client`                      | Qdrant client instance                                 |
+| `collection_name`             | Name of Qdrant collection                              |
+| `embedding_model_name`        | Name of embedding model (e.g., text-embedding-ada-002) |
+| `embedding_size`              | Size of embedding vectors (e.g., 1536)                 |
 
-    Q --> R[Insert Vectors into Qdrant]
+---
 
-    subgraph Logging
-        S1[Global Logger]
-        S2[Per-PDF Logger]
-    end
+## 🔄 Pipeline Flow
 
-    A --> Logging
-    R --> Logging
+```mermaid
+flowchart LR
+    A[PDF File] --> B[Convert to Images]
+    B --> C[OCR Extraction with Vision LLM]
+    C --> D[Markdown Text per Page]
+    D --> E[LangChain Documents]
+    E --> F[Chunking & Metadata Enrichment]
+    F --> G[Generate Embeddings]
+    G --> H[Ingest into Qdrant Vector DB]
+    A --> I[Logging & Cache Files]
+```
+
+**Steps in brief:**
+
+1. **Load PDF & Convert to Images** – Supports scanned & digital PDFs
+2. **OCR Extraction** – Extract text, tables, equations, diagrams via LLM
+3. **Chunk & Enrich Metadata** – Page info, chunk ID, document ID, subject, etc.
+4. **Vector Embeddings & Qdrant Ingestion** – Upload chunks as vectors
+5. **Logging & Cache** – PDF-specific logs, global logs, JSON cache
+
+---
+
+## ⚡ Quick Example
+
+```python
+from pdf_ingestion_pipeline import load_chunk_ingest_scanned_pdf
+from langchain_openai import ChatOpenAI
+from qdrant_client import QdrantClient
+
+# Initialize OCR LLM
+vision_model = ChatOpenAI(model="gpt-4.1-mini")
+
+# Initialize Qdrant client
+client = QdrantClient(url="http://localhost:6333")
+
+# Ingest PDF
+load_chunk_ingest_scanned_pdf(
+    pdf_path="sample.pdf",
+    subject="Physics",
+    semester="Semester 2",
+    unit="Unit 4",
+    version="v1",
+    vision_model=vision_model,
+    client=client,
+    collection_name="physics_collection",
+    embedding_model_name="text-embedding-ada-002",
+    embedding_size=1536
+)
+```
+
+---
+
+## 📂 Directory Structure
+
+```
+project-root/
+├── extracted_documents/      # OCR page content JSON files
+├── extracted_chunks/         # Chunked documents JSON files
+├── logs/                     # PDF-specific & global logs
+├── pdf_ingestion_pipeline.py # Pipeline code
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## ✅ Features
+
+* Works for **scanned & digital PDFs**
+* Saves **JSON cache files** to avoid repeated OCR
+* Provides **detailed logging** per PDF & global
+* Supports **large PDFs & batch ingestion**
+* Easy to integrate with **LangChain & Qdrant**
+
+---
+
+This README is **GitHub-ready**:
+
+* Mermaid diagram renders cleanly
+* Compact yet informative
+* Users can run the pipeline quickly
+
+---
+
+If you want, I can also **make a “visual GitHub README” with colored boxes and emojis** to make it even more **eye-catching and presentation-ready**.
+
+Do you want me to do that next?
