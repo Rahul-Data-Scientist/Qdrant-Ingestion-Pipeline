@@ -81,10 +81,12 @@ def extract_page_content(llm, image):
                 "type": "text",
                 "text": (
                     "Extract ALL content from this scanned page.\n"
+                    "- Ignore headers and footers if present\n"
                     "- Preserve headings\n"
                     "- Convert tables to Markdown tables\n"
                     "- Write equations in LaTeX-style text\n"
-                    "- Describe diagrams briefly if present\n"
+                    "- If diagrams are present, give detailed textual description of them. DO NOT TRY TO DRAW THEM. Just describe the figure/diagram textually\n"
+                    "Maintain the exact document flow: Extract content in the precise spatial order it appears on the page (e.g., text, followed by figure description, followed by table, etc.)."
                     "- Do NOT hallucinate\n"
                     "- Output clean markdown"
                 )
